@@ -4,10 +4,10 @@
 /// 同时把 pubspec.yaml 的 version 改成 `<current>+<build>`。
 class AppVersion {
   /// 当前版本号（展示用）。
-  static const String current = '1.2.0';
+  static const String current = '1.2.1';
 
   /// 构建号，必须严格递增；用来判断「这一版是不是第一次打开」。
-  static const int build = 10;
+  static const int build = 11;
 
   /// 更新日志，最新的放最前面。
   static const List<VersionLog> logs = <VersionLog>[
