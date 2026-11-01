@@ -1,6 +1,6 @@
 {
     "version": "1.2.4",
     "build": 14,
-    "apkUrl": "https://gitee.com/Linlinlin4567/money-come-back/releases/download/v1.2.4/本钱回笼记.apk",
-    "notes": "本次更新：\n1. 设置页去掉了「更新源地址」输入框和「保存地址 / 用内置源」按钮，检查更新固定使用内置源，界面更清爽。\n2. 点「检查更新」依旧会自动比对版本、下载并安装。"
+    "apkUrl": "https://github.com/linlinlin456/MoneyComeBack/releases/download/v1.2.4/v1.2.4.apk",
+    "notes": "本次更新：\n1. 设置页去掉了「更新源地址」输入框和「保存地址 / 用内置源」按钮，检查更新固定使用内置源。\n2. 「关于」里的版本号不再显示后面的构建号。"
 }
