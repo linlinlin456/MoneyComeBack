@@ -4,13 +4,28 @@
 /// 同时把 pubspec.yaml 的 version 改成 `<current>+<build>`。
 class AppVersion {
   /// 当前版本号（展示用）。
-  static const String current = '1.2.1';
+  static const String current = '1.2.2';
 
   /// 构建号，必须严格递增；用来判断「这一版是不是第一次打开」。
-  static const int build = 11;
+  static const int build = 12;
 
   /// 更新日志，最新的放最前面。
   static const List<VersionLog> logs = <VersionLog>[
+    VersionLog(
+      version: '1.2.2',
+      build: 12,
+      date: '2026-11-01',
+      items: <String>[
+        '修正「只记付费书」的总价值：以前体验卡可读的书虽然显示成'
+            '「体验卡可读」，但它的定价仍被算进总价值。现在只记付费书时，'
+            '只有付费会员可读的书才计入金额，首页「已读价值」和书值页'
+            '「总价值」口径一致。',
+        '「检查更新」升级为 App 内一键更新：发现新版本后点「立即更新」，'
+            '会直接在 App 里下载安装包并调起安装，不用再跳浏览器手动下载。',
+        '打开 App 时会按「更新源地址」自动检查一次更新，有新版本才弹窗提示。',
+        '更新源地址填错时给出更清楚的提示（比如把 APK 下载链接填进来时）。',
+      ],
+    ),
     VersionLog(
       version: '1.2.0',
       build: 10,

@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 /// 更新源返回的版本信息。
 class UpdateInfo {
@@ -55,5 +58,54 @@ class UpdateService {
       throw Exception('更新源返回的不是一份 JSON 对象');
     }
     return UpdateInfo.fromJson(Map<String, dynamic>.from(decoded));
+  }
+
+  /// 把新版本 APK 下载到本机，返回落地文件路径。
+  ///
+  /// [onProgress] 回调 (已下载字节, 总字节)；总字节为 -1 表示服务端没给长度。
+  static Future<String> downloadApk(
+    String url, {
+    void Function(int received, int total)? onProgress,
+  }) async {
+    final Uri uri = Uri.parse(url.trim());
+    if (!uri.hasScheme) {
+      throw Exception('下载地址要以 http:// 或 https:// 开头');
+    }
+    final http.Client client = http.Client();
+    try {
+      final http.StreamedResponse resp = await client
+          .send(http.Request('GET', uri))
+          .timeout(const Duration(seconds: 30));
+      if (resp.statusCode != 200) {
+        throw Exception('下载失败：服务器返回 ${resp.statusCode}');
+      }
+      final int total = resp.contentLength ?? -1;
+      final Directory dir = await getApplicationSupportDirectory();
+      final File file = File('${dir.path}/benqian-new.apk');
+      if (await file.exists()) {
+        await file.delete();
+      }
+      final IOSink sink = file.openWrite();
+      int received = 0;
+      await for (final List<int> chunk in resp.stream) {
+        received += chunk.length;
+        sink.add(chunk);
+        onProgress?.call(received, total);
+      }
+      await sink.flush();
+      await sink.close();
+      return file.path;
+    } finally {
+      client.close();
+    }
+  }
+
+  /// 调起系统安装器，安装已经下载好的 APK。
+  static Future<void> installApk(String path) async {
+    const MethodChannel channel = MethodChannel('com.example.book_roi/install');
+    await channel.invokeMethod<bool>(
+      'installApk',
+      <String, dynamic>{'path': path},
+    );
   }
 }

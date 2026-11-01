@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/app_version.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
+import '../widgets/update_flow.dart';
 import '../widgets/version_dialog.dart';
 import 'books_page.dart';
 import 'home_page.dart';
@@ -23,6 +24,9 @@ class _RootPageState extends State<RootPage> {
   /// 启动后只检查一次「要不要弹更新说明」。
   bool _updateChecked = false;
 
+  /// 启动后只自动检查一次更新源。
+  bool _autoChecked = false;
+
   static const List<String> _titles = <String>['首页', '书值', '设置'];
 
   @override
@@ -37,6 +41,11 @@ class _RootPageState extends State<RootPage> {
     if (!_updateChecked) {
       _updateChecked = true;
       WidgetsBinding.instance.addPostFrameCallback((_) => _checkUpdate(state));
+    }
+    if (!_autoChecked) {
+      _autoChecked = true;
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _autoCheckUpdate(state));
     }
     final List<Widget> pages = <Widget>[
       const HomePage(),
@@ -61,6 +70,17 @@ class _RootPageState extends State<RootPage> {
       title: '已更新到 v${log.version}',
     );
     await state.settings.markVersionSeen(AppVersion.build);
+  }
+
+  /// 启动时按「更新源地址」静默检查一次；只有真的发现新版本才会弹窗。
+  Future<void> _autoCheckUpdate(AppState state) async {
+    final String url = state.settings.updateUrl.trim();
+    if (url.isEmpty) return;
+    if (!mounted) return;
+    // 让首屏和「本次更新」弹窗先出来，避免几个框叠在一起。
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    if (!mounted) return;
+    await runUpdateFlow(context, url: url, silent: true);
   }
 
   Widget _navBar() {

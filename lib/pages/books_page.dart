@@ -69,9 +69,15 @@ class _BooksPageState extends State<BooksPage> {
       return _ascending ? -r : r;
     });
 
+    // 「只记付费书」时总价值只累加「付费会员可读」的书；
+    // 体验卡可读 / 按章购买 / 免费阅读的书仍在列表里，但不计入金额。
     final double totalValue = state.books.fold(
       0.0,
-      (double sum, Book b) => sum + b.value(byProgress: byProgress),
+      (double sum, Book b) =>
+          sum +
+          ((!onlyPaidPricing || b.isPaidBook)
+              ? b.value(byProgress: byProgress)
+              : 0.0),
     );
 
     return Stack(

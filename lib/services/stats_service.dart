@@ -67,7 +67,11 @@ class RoiStats {
         if (b.price > 0) priceSum += b.price;
       }
       if (b.finished) finished++;
-      readValue += b.value(byProgress: byProgress);
+      // 「只记付费书」时，体验卡可读 / 按章购买 / 免费阅读的书
+      // 只列出来给人看，不把它们的定价算进已读价值。
+      if (!onlyPaidPricing || b.isPaidBook) {
+        readValue += b.value(byProgress: byProgress);
+      }
     }
     // 平均书价的分母：只记付费书时用「付费会员书的本数」，否则用全部书数。
     final int avgBase = onlyPaidPricing ? pricedCount : counted;

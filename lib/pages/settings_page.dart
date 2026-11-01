@@ -2,7 +2,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../models/app_version.dart';
 import '../models/cost_item.dart';
@@ -11,6 +10,7 @@ import '../services/backup_service.dart';
 import '../services/update_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/update_flow.dart';
 import '../widgets/version_dialog.dart';
 import 'cost_page.dart';
 
@@ -500,7 +500,7 @@ class _SettingsPageState extends State<SettingsPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('同步失败：${_clean(e)}')),
+        SnackBar(content: Text('同步失败：${cleanError(e)}')),
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -519,7 +519,7 @@ class _SettingsPageState extends State<SettingsPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('导出失败：${_clean(e)}')),
+        SnackBar(content: Text('导出失败：${cleanError(e)}')),
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -545,7 +545,7 @@ class _SettingsPageState extends State<SettingsPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('导入失败：${_clean(e)}')),
+        SnackBar(content: Text('导入失败：${cleanError(e)}')),
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -586,72 +586,10 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  /// 检查更新：从更新源拉 version.json，比对构建号，有新版就去下载。
+  /// 检查更新：拉更新源比对构建号，有新版本就在 App 内下载并调起安装。
   Future<void> _checkUpdate() async {
-    final String url = _updateUrl.text.trim();
-    if (url.isEmpty) {
-      _toast('先在「更新源地址」里填一份 version.json 的网址，再点检查更新');
-      return;
-    }
     setState(() => _busy = true);
-    try {
-      final UpdateInfo info = await UpdateService.fetch(url);
-      if (!mounted) return;
-      if (info.build <= AppVersion.build) {
-        _toast('已是最新版本 v${AppVersion.current}');
-        return;
-      }
-      final bool go = await showDialog<bool>(
-            context: context,
-            builder: (BuildContext ctx) => AlertDialog(
-              backgroundColor: AppTheme.card,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              title: Text(
-                '发现新版本 v${info.version}',
-                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-              ),
-              content: SingleChildScrollView(
-                child: Text(
-                  info.notes.isEmpty ? '有新版本可以更新。' : info.notes,
-                  style: const TextStyle(fontSize: 13, height: 1.5),
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: const Text(
-                    '稍后',
-                    style: TextStyle(color: AppTheme.inkSoft),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(true),
-                  child: const Text(
-                    '去下载',
-                    style: TextStyle(color: AppTheme.ink),
-                  ),
-                ),
-              ],
-            ),
-          ) ??
-          false;
-      if (go && info.apkUrl.isNotEmpty) {
-        final bool ok = await launchUrl(
-          Uri.parse(info.apkUrl),
-          mode: LaunchMode.externalApplication,
-        );
-        if (!ok) _toast('没能打开下载链接：${info.apkUrl}');
-      }
-    } catch (e) {
-      _toast('检查更新失败：${_clean(e)}');
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
+    await runUpdateFlow(context, url: _updateUrl.text);
+    if (mounted) setState(() => _busy = false);
   }
-
-  static String _clean(Object e) => e.toString().replaceFirst('Exception: ', '');
 }
-
-
