@@ -4,13 +4,25 @@
 /// 同时把 pubspec.yaml 的 version 改成 `<current>+<build>`。
 class AppVersion {
   /// 当前版本号（展示用）。
-  static const String current = '1.2.4';
+  static const String current = '1.2.5';
 
   /// 构建号，必须严格递增；用来判断「这一版是不是第一次打开」。
-  static const int build = 14;
+  static const int build = 15;
 
   /// 更新日志，最新的放最前面。
   static const List<VersionLog> logs = <VersionLog>[
+    VersionLog(
+      version: '1.2.5',
+      build: 15,
+      date: '2026-11-01',
+      items: <String>[
+        '扫码录入修好了：以前扫完只填上 ISBN，书名、作者、定价都是空白，'
+            '现在扫完会自动带出书名、作者和定价。',
+        '扫描速度明显变快：只识别书背的 EAN-13 条码，而且只在取景框内解码。',
+        '查询换成了国内能直连的图书数据源，不再因为连不上国外接口'
+            '而干等半分钟。',
+      ],
+    ),
     VersionLog(
       version: '1.2.4',
       build: 14,

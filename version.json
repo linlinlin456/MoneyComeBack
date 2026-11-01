@@ -1,6 +1,6 @@
 {
-    "version": "1.2.4",
-    "build": 14,
-    "apkUrl": "https://github.com/linlinlin456/MoneyComeBack/releases/download/v1.2.4/v1.2.4.apk",
-    "notes": "本次更新：\n1. 设置页去掉了「更新源地址」输入框和「保存地址 / 用内置源」按钮，检查更新固定使用内置源。\n2. 「关于」里的版本号不再显示后面的构建号。"
+    "version": "1.2.5",
+    "build": 15,
+    "apkUrl": "https://github.com/linlinlin456/MoneyComeBack/releases/download/v1.2.5/v1.2.5.apk",
+    "notes": "本次更新：\n1. 扫码录入修好了：以前扫完只填上 ISBN，书名、作者、定价都是空白，现在扫完会自动带出书名、作者和定价。\n2. 扫描速度明显变快：只识别书背的 EAN-13 条码，而且只在取景框内解码。\n3. 查询换成了国内能直连的图书数据源，不再因为连不上国外接口而干等半分钟。"
 }
