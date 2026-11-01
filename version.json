@@ -1,6 +1,6 @@
 {
     "version": "1.2.1",
     "build": 11,
-    "apkUrl": "sha256:f0deac32a92f3bb537757ee197dc47f81043af6ce6ed3dc161fd33e0e0069c86",
+    "apkUrl": "https://github.com/linlinlin456/MoneyComeBack/releases/download/v1.2.1/default.apk",
     "notes": "本次更新：\n1. 版本号更新到 1.2.1（功能与 1.2.0 一致：修正书籍分类、只记付费书显示定价、全部记录按定价显示、关于页新增检查更新）。\n2. 若这一版还有新的改动，把上面的文字替换成你自己的更新说明即可，App 内「检查更新」会原样显示。"
 }
