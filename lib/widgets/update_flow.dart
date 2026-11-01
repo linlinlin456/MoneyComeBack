@@ -7,30 +7,28 @@ import '../theme/app_theme.dart';
 /// 「检查更新」的完整流程：
 /// 拉更新源 → 比对构建号 → 弹窗 → App 内下载 APK → 调起系统安装器。
 ///
+/// [url] 留空时自动使用内置更新源，正常情况下不需要填。
 /// [silent] 为 true 时用于启动自动检查：没有新版、或拉取失败都安静结束，
 /// 只有真的发现新版本才打扰用户。
 Future<void> runUpdateFlow(
   BuildContext context, {
-  required String url,
+  String url = '',
   bool silent = false,
 }) async {
-  final String source = url.trim();
-  if (source.isEmpty) {
-    if (!silent) {
-      _toast(context, '先在「更新源地址」里填一份 version.json 的网址，再点检查更新');
-    }
-    return;
-  }
-  if (source.endsWith('.apk') || source.endsWith('.apk/')) {
+  final String custom = url.trim();
+  if (custom.endsWith('.apk') || custom.endsWith('.apk/')) {
     if (!silent) {
       _toast(context, '这里要填 version.json 的网址，不是 APK 下载链接');
     }
     return;
   }
+  // 没填地址就用内置更新源；填了则只用填的那个。
+  final List<String> sources =
+      custom.isEmpty ? UpdateService.builtInSources : <String>[custom];
 
   final UpdateInfo info;
   try {
-    info = await UpdateService.fetch(source);
+    info = await UpdateService.fetchFirst(sources);
   } catch (e) {
     if (!silent) _toast(context, '检查更新失败：${cleanError(e)}');
     return;

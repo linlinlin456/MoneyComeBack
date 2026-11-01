@@ -41,6 +41,35 @@ class UpdateInfo {
 /// }
 /// ```
 class UpdateService {
+  /// 内置更新源：按顺序尝试，任意一个能拉到就用它。
+  ///
+  /// 设置页的「更新源地址」留空时就用这几个，所以正常情况下什么都不用填。
+  /// 两个仓库（Gitee / GitHub）任意一个放了 version.json 都能生效。
+  static const List<String> builtInSources = <String>[
+    'https://gitee.com/Linlinlin4567/money-come-back/raw/master/version.json',
+    'https://raw.githubusercontent.com/linlinlin456/MoneyComeBack/master/version.json',
+  ];
+
+  /// 依次尝试多个更新源，返回第一个成功拉到的版本信息。
+  static Future<UpdateInfo> fetchFirst(List<String> urls) async {
+    final List<String> tried = <String>[];
+    Object? lastError;
+    for (final String u in urls) {
+      final String one = u.trim();
+      if (one.isEmpty) continue;
+      tried.add(one);
+      try {
+        return await fetch(one);
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    if (tried.isEmpty) {
+      throw Exception('没有可用的更新源');
+    }
+    throw Exception('更新源都拉取失败：${lastError ?? '未知原因'}');
+  }
+
   static Future<UpdateInfo> fetch(String url) async {
     final Uri uri = Uri.parse(url.trim());
     if (!uri.hasScheme) {

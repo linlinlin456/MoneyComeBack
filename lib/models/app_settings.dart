@@ -11,8 +11,12 @@ class AppSettings {
   /// 已经看过更新说明的最高构建号。启动时用它判断要不要弹「本次更新」。
   int lastSeenVersion;
 
-  /// 更新源地址：一份 version.json 的网址，留空表示不自动检查更新。
+  /// 更新源地址：一份 version.json 的网址。
+  /// 留空就用代码里内置的更新源（Gitee / GitHub 依次尝试）。
   String updateUrl;
+
+  /// 启动 App 时自动同步一次微信读书。
+  bool autoSyncOnStart;
 
   /// 定价记录范围。
   ///
@@ -30,6 +34,7 @@ class AppSettings {
     this.lastSyncAt = '',
     this.lastSeenVersion = 0,
     this.updateUrl = '',
+    this.autoSyncOnStart = true,
     this.onlyPaidPricing = true,
   });
 
@@ -41,6 +46,7 @@ class AppSettings {
   static const String _kLastSeenVersion = 'last_seen_version';
   static const String _kUpdateUrl = 'update_url';
   static const String _kOnlyPaidPricing = 'only_paid_pricing';
+  static const String _kAutoSyncOnStart = 'auto_sync_on_start';
 
   static Future<AppSettings> load() async {
     final SharedPreferences sp = await SharedPreferences.getInstance();
@@ -52,6 +58,7 @@ class AppSettings {
       lastSyncAt: sp.getString(_kLastSyncAt) ?? '',
       lastSeenVersion: sp.getInt(_kLastSeenVersion) ?? 0,
       updateUrl: sp.getString(_kUpdateUrl) ?? '',
+      autoSyncOnStart: sp.getBool(_kAutoSyncOnStart) ?? true,
       onlyPaidPricing: sp.getBool(_kOnlyPaidPricing) ?? true,
     );
   }
@@ -65,6 +72,7 @@ class AppSettings {
     await sp.setString(_kLastSyncAt, lastSyncAt);
     await sp.setInt(_kLastSeenVersion, lastSeenVersion);
     await sp.setString(_kUpdateUrl, updateUrl);
+    await sp.setBool(_kAutoSyncOnStart, autoSyncOnStart);
     await sp.setBool(_kOnlyPaidPricing, onlyPaidPricing);
   }
 

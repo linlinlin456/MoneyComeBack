@@ -27,6 +27,9 @@ class _RootPageState extends State<RootPage> {
   /// 启动后只自动检查一次更新源。
   bool _autoChecked = false;
 
+  /// 启动后只自动同步一次微信读书。
+  bool _autoSynced = false;
+
   static const List<String> _titles = <String>['首页', '书值', '设置'];
 
   @override
@@ -46,6 +49,10 @@ class _RootPageState extends State<RootPage> {
       _autoChecked = true;
       WidgetsBinding.instance
           .addPostFrameCallback((_) => _autoCheckUpdate(state));
+    }
+    if (!_autoSynced) {
+      _autoSynced = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _autoSync(state));
     }
     final List<Widget> pages = <Widget>[
       const HomePage(),
@@ -72,15 +79,34 @@ class _RootPageState extends State<RootPage> {
     await state.settings.markVersionSeen(AppVersion.build);
   }
 
-  /// 启动时按「更新源地址」静默检查一次；只有真的发现新版本才会弹窗。
+  /// 启动时静默检查一次更新；没填地址就用内置更新源。
+  /// 只有真的发现新版本才会弹窗。
   Future<void> _autoCheckUpdate(AppState state) async {
-    final String url = state.settings.updateUrl.trim();
-    if (url.isEmpty) return;
     if (!mounted) return;
-    // 让首屏和「本次更新」弹窗先出来，避免几个框叠在一起。
-    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    // 让首屏、自动同步和「本次更新」弹窗先出来，避免几个框叠在一起。
+    await Future<void>.delayed(const Duration(milliseconds: 2500));
     if (!mounted) return;
-    await runUpdateFlow(context, url: url, silent: true);
+    await runUpdateFlow(
+      context,
+      url: state.settings.updateUrl.trim(),
+      silent: true,
+    );
+  }
+
+  /// 启动时自动同步一次微信读书（可在设置里关掉）。
+  ///
+  /// 没填 API Key 就直接跳过；失败也不弹窗，免得每次开 App 都被打扰。
+  Future<void> _autoSync(AppState state) async {
+    if (!state.settings.autoSyncOnStart) return;
+    if (state.settings.wereadApiKey.trim().isEmpty) return;
+    if (state.syncing) return;
+    await Future<void>.delayed(const Duration(milliseconds: 900));
+    if (!mounted) return;
+    try {
+      await state.syncFromWeRead();
+    } catch (_) {
+      // 自动同步失败保持安静：设置页里能看到上次同步时间与结果。
+    }
   }
 
   Widget _navBar() {

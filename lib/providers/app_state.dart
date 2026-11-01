@@ -133,6 +133,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 启动时自动同步微信读书。
+  Future<void> setAutoSyncOnStart(bool enabled) async {
+    settings.autoSyncOnStart = enabled;
+    await settings.save();
+    notifyListeners();
+  }
+
   Future<void> saveApiKey(String key) async {
     settings.wereadApiKey = key.trim();
     await settings.save();

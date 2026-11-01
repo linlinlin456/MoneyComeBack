@@ -142,7 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
             style: const TextStyle(fontSize: 12),
             decoration: InputDecoration(
               isDense: true,
-              hintText: '填一份 version.json 的网址，留空则不自动检查更新',
+              hintText: '留空即用内置更新源，一般不用填',
               hintStyle: const TextStyle(fontSize: 11, color: AppTheme.inkFaint),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -151,6 +151,11 @@ class _SettingsPageState extends State<SettingsPage> {
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            '留空就用内置更新源（Gitee / GitHub 依次尝试），不用自己填也能检查更新。',
+            style: TextStyle(fontSize: 11, color: AppTheme.inkFaint),
           ),
           const SizedBox(height: 6),
           Row(
@@ -168,6 +173,24 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 child: const Text(
                   '保存地址',
+                  style: TextStyle(fontSize: 12, color: AppTheme.ink),
+                ),
+              ),
+              const SizedBox(width: 14),
+              TextButton(
+                onPressed: () async {
+                  _updateUrl.clear();
+                  await state.setUpdateUrl('');
+                  if (!mounted) return;
+                  _toast('已恢复为内置更新源');
+                },
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text(
+                  '用内置源',
                   style: TextStyle(fontSize: 12, color: AppTheme.ink),
                 ),
               ),
@@ -308,6 +331,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Text(_busy ? '同步中…' : '立即同步'),
               ),
             ],
+          ),
+          const SizedBox(height: 6),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: state.settings.autoSyncOnStart,
+            onChanged: (bool v) => state.setAutoSyncOnStart(v),
+            title: const Text('启动时自动同步', style: TextStyle(fontSize: 14)),
+            subtitle: const Text(
+              '每次打开 App 自动拉一次书架和阅读进度',
+              style: TextStyle(fontSize: 11, color: AppTheme.inkFaint),
+            ),
           ),
           if (state.settings.lastSyncAt.isNotEmpty) ...<Widget>[
             const SizedBox(height: 10),

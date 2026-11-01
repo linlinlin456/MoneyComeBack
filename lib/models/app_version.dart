@@ -4,13 +4,25 @@
 /// 同时把 pubspec.yaml 的 version 改成 `<current>+<build>`。
 class AppVersion {
   /// 当前版本号（展示用）。
-  static const String current = '1.2.2';
+  static const String current = '1.2.3';
 
   /// 构建号，必须严格递增；用来判断「这一版是不是第一次打开」。
-  static const int build = 12;
+  static const int build = 13;
 
   /// 更新日志，最新的放最前面。
   static const List<VersionLog> logs = <VersionLog>[
+    VersionLog(
+      version: '1.2.3',
+      build: 13,
+      date: '2026-11-01',
+      items: <String>[
+        '「检查更新」不用再自己填更新源地址了：更新源已经内置在 App 里，'
+            '直接点「检查更新」就能比对版本、下载并安装。',
+        '启动时自动同步微信读书：每次打开 App 会自动拉一次书架和阅读进度，'
+            '不用再手动点「立即同步」。',
+        '设置页新增「启动时自动同步」开关，可以随时关掉。',
+      ],
+    ),
     VersionLog(
       version: '1.2.2',
       build: 12,
