@@ -1,6 +1,6 @@
 {
-    "version": "1.2.3",
-    "build": 13,
-    "apkUrl": "https://gitee.com/Linlinlin4567/money-come-back/releases/download/v1.2.3/本钱回笼记.apk",
-    "notes": "本次更新：\n1. 「检查更新」不用再自己填更新源地址了 —— 更新源已内置在 App 里，直接点「检查更新」就能比对版本、下载并安装。\n2. 启动 App 时自动同步一次微信读书（书架 + 阅读进度），设置页新增「启动时自动同步」开关，可随时关掉。"
+    "version": "1.2.4",
+    "build": 14,
+    "apkUrl": "https://gitee.com/Linlinlin4567/money-come-back/releases/download/v1.2.4/本钱回笼记.apk",
+    "notes": "本次更新：\n1. 设置页去掉了「更新源地址」输入框和「保存地址 / 用内置源」按钮，检查更新固定使用内置源，界面更清爽。\n2. 点「检查更新」依旧会自动比对版本、下载并安装。"
 }

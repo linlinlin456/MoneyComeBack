@@ -4,13 +4,23 @@
 /// 同时把 pubspec.yaml 的 version 改成 `<current>+<build>`。
 class AppVersion {
   /// 当前版本号（展示用）。
-  static const String current = '1.2.3';
+  static const String current = '1.2.4';
 
   /// 构建号，必须严格递增；用来判断「这一版是不是第一次打开」。
-  static const int build = 13;
+  static const int build = 14;
 
   /// 更新日志，最新的放最前面。
   static const List<VersionLog> logs = <VersionLog>[
+    VersionLog(
+      version: '1.2.4',
+      build: 14,
+      date: '2026-11-01',
+      items: <String>[
+        '设置页去掉了「更新源地址」输入框和「保存地址 / 用内置源」按钮，'
+            '检查更新固定使用内置更新源。',
+        '「关于」里的版本号不再显示后面的构建号。',
+      ],
+    ),
     VersionLog(
       version: '1.2.3',
       build: 13,

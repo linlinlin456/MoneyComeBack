@@ -7,7 +7,6 @@ import '../models/app_version.dart';
 import '../models/cost_item.dart';
 import '../providers/app_state.dart';
 import '../services/backup_service.dart';
-import '../services/update_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common.dart';
 import '../widgets/update_flow.dart';
@@ -24,7 +23,6 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _apiKey = TextEditingController();
-  final TextEditingController _updateUrl = TextEditingController();
 
   bool _keyLoaded = false;
   bool _busy = false;
@@ -32,7 +30,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void dispose() {
     _apiKey.dispose();
-    _updateUrl.dispose();
     super.dispose();
   }
 
@@ -41,7 +38,6 @@ class _SettingsPageState extends State<SettingsPage> {
     final AppState state = context.watch<AppState>();
     if (!_keyLoaded) {
       _apiKey.text = state.settings.wereadApiKey;
-      _updateUrl.text = state.settings.updateUrl;
       _keyLoaded = true;
     }
     final double totalCost =
@@ -89,7 +85,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            '版本 ${AppVersion.current}（构建 ${AppVersion.build}）',
+            '版本 ${AppVersion.current}',
             style: const TextStyle(fontSize: 12, color: AppTheme.inkSoft),
           ),
           const SizedBox(height: 4),
@@ -127,71 +123,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Text(
                   _busy ? '检查中…' : '检查更新',
                   style: const TextStyle(fontSize: 12, color: AppTheme.ink),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            '更新源地址',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 6),
-          TextField(
-            controller: _updateUrl,
-            style: const TextStyle(fontSize: 12),
-            decoration: InputDecoration(
-              isDense: true,
-              hintText: '留空即用内置更新源，一般不用填',
-              hintStyle: const TextStyle(fontSize: 11, color: AppTheme.inkFaint),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppTheme.line),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            '留空就用内置更新源（Gitee / GitHub 依次尝试），不用自己填也能检查更新。',
-            style: TextStyle(fontSize: 11, color: AppTheme.inkFaint),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: <Widget>[
-              TextButton(
-                onPressed: () async {
-                  await state.setUpdateUrl(_updateUrl.text);
-                  if (!mounted) return;
-                  _toast('更新源地址已保存');
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: const Text(
-                  '保存地址',
-                  style: TextStyle(fontSize: 12, color: AppTheme.ink),
-                ),
-              ),
-              const SizedBox(width: 14),
-              TextButton(
-                onPressed: () async {
-                  _updateUrl.clear();
-                  await state.setUpdateUrl('');
-                  if (!mounted) return;
-                  _toast('已恢复为内置更新源');
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: const Text(
-                  '用内置源',
-                  style: TextStyle(fontSize: 12, color: AppTheme.ink),
                 ),
               ),
             ],
@@ -620,10 +551,10 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  /// 检查更新：拉更新源比对构建号，有新版本就在 App 内下载并调起安装。
+  /// 检查更新：用内置更新源比对构建号，有新版本就在 App 内下载并调起安装。
   Future<void> _checkUpdate() async {
     setState(() => _busy = true);
-    await runUpdateFlow(context, url: _updateUrl.text);
+    await runUpdateFlow(context);
     if (mounted) setState(() => _busy = false);
   }
 }

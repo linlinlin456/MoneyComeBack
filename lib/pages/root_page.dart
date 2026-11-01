@@ -79,18 +79,14 @@ class _RootPageState extends State<RootPage> {
     await state.settings.markVersionSeen(AppVersion.build);
   }
 
-  /// 启动时静默检查一次更新；没填地址就用内置更新源。
+  /// 启动时静默检查一次更新（固定用内置更新源）。
   /// 只有真的发现新版本才会弹窗。
   Future<void> _autoCheckUpdate(AppState state) async {
     if (!mounted) return;
     // 让首屏、自动同步和「本次更新」弹窗先出来，避免几个框叠在一起。
     await Future<void>.delayed(const Duration(milliseconds: 2500));
     if (!mounted) return;
-    await runUpdateFlow(
-      context,
-      url: state.settings.updateUrl.trim(),
-      silent: true,
-    );
+    await runUpdateFlow(context, silent: true);
   }
 
   /// 启动时自动同步一次微信读书（可在设置里关掉）。
